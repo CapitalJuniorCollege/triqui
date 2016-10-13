@@ -1,92 +1,74 @@
-var Player = function(){
-  return {
-    nickname: null,
-    mark: null,
-    max_in_a_row: 0,
-    is_playing: false
+/*jslint esversion:6 */
+/*
+ * Game Object Definition
+ */
+const gamer1 = "x";
+const gamer2 = "o";
+var game = {}; // new Object();
+game.turn = gamer1;//takes values beetwen 0 and 1, if 0 turn of X, if 1 turn of O,
+game.over = false;
+game.winner = null;
+game.board = [
+  [null,null,null],
+  [null,null,null],
+  [null,null,null]
+];
+game.nextTurn = function(){
+  if(game.turn === gamer1){
+    game.turn = gamer2;
+  }else{
+    game.turn = gamer1;
   }
+  return game.turn;
 };
+/*
+ * END Game Object Definition
+ */
 
-var Game = function(){
-  return {
-    board: [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]],
-    dom_board: null,
-    marks_count: 0,
-    current_player: 0,
-    marks: [[false,false,false],[false,false,false],[false,false,false]],
-    startGame: function(){
-      this.board = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]];
-      this.marks_count = 0;
-      this.current_player = Math.round(Math.random());
-      this.dom_board = document.querySelectorAll("#boardgame>ul>li");
-      this.dom_board.forEach(function(element, index){
-        element.textContent = "";
-      });
-    },
-    getMark: function(){
-      if(this.current_player === 0){
-        return "O";
-      }else{
-        return "X";
-      }
-    },
-    checkMark: function(x,y,count){
-      if(this.current_player === this.board[x][y] && !this.marks[x][y]){
-        console.log(this.marks);
-        this.marks[x][y] = true;
-        count += 1;
-        if(count !== 3){
-            if(y-1 >= 0){ // check top
-              console.log("top");
-               this.checkMark(x,y-1,count );
-            }
-            if(x+1 < 3 ){// check right
-              console.log("right");
-               this.checkMark(x+1,y,count);
-            }
-            if(y+1 < 3){// check bottom
-              console.log("bottom");
-               this.checkMark(x,y+1,count );
-            }
-            if(x-1 >= 0){// check left
-              console.log("left");
-               this.checkMark(x-1,y,count );
-            }
-            return false;
-        }
-        return "winner";
-      }else{
-        return false;
-      }
-    },
-    playerMove: function(){
-      var self = this;
-        return function(){
-          if(this.textContent !== "1" && this.textContent !== "0"){
-            x = Number(this.getAttribute("data-x"));
-            y = Number(this.getAttribute("data-y"));
-            self.board[x][y] = self.current_player;
-            self.marks_count = 1 + Number(self.marks_count) ;
-            this.textContent = self.getMark();
-            console.log(self.checkMark(x,y,1));
-            self.marks = [[false,false,false],[false,false,false],[false,false,false]]
-            if(self.current_player === 0){
-              self.current_player = 1;
-            }else{
-              self.current_player = 0;
-            }
+document.addEventListener("DOMContentLoaded",function(){
+  //Here must be only what need Dom elements
+  var row0 = document.querySelectorAll("#boardgame li[data-y='0']");
+  var row1 = document.querySelectorAll("#boardgame li[data-y='1']");
+  var row2 = document.querySelectorAll("#boardgame li[data-y='2']");
+  var playing_info = document.querySelectorAll("#game-info .player");
+  playing_info = Array.from(playing_info);
+  game.board[0] = Array.from(row0);
+  game.board[1] = Array.from(row1);
+  game.board[2] = Array.from(row2);
+  //board ready
+  game.board.forEach(function(row,index,board){
+    //add click behavior per cell
+    row.forEach(function(cell, index, row){
+        cell.addEventListener("click",function(){
+          cell.textContent = game.turn;
+          if(game.nextTurn() === gamer1){
+            playing_info[0].querySelector(".status").textContent = "Juega";
+            playing_info[1].querySelector(".status").textContent = "Espera";
+          }else{
+            playing_info[0].querySelector(".status").textContent = "Espera";
+            playing_info[1].querySelector(".status").textContent = "Juega";
           }
-        };
-    }
-  }
-};
 
-
-document.addEventListener("DOMContentLoaded", function(event){
-  var game = Game();
-  game.startGame();
-  console.log(game);
-  game.dom_board.forEach(function(element, index){
-    element.addEventListener("click", game.playerMove());
-  });
+        });
+    });//for each of row
+  });//for each of board
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
