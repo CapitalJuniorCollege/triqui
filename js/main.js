@@ -59,6 +59,14 @@ game.checkWinner = function(){
     }
   //return the winner if there is one else return null
 };
+game.clearBoard = function(){
+  if(game.board.dom_ready === false){return;}
+  game.board.forEach(function(row){
+    row.forEach(function(cell){
+      cell.textContent = "";
+    });
+  });
+};
 /*
  * END Game Object Definition
  */
@@ -79,10 +87,14 @@ document.addEventListener("DOMContentLoaded",function(){
     //add click behavior per cell
     row.forEach(function(cell, index, row){
         cell.addEventListener("click",function(){
-          if(cell.textContent !== ""){
+          if(cell.textContent !== "" || game.winner !== null){
             return; //exit condition
           }
           cell.textContent = game.turn;
+          game.checkWinner();
+          if(game.winner !==null){
+            game.clearBoard();
+          }
           if(game.nextTurn() === gamer1){
             playing_info[0].querySelector(".status").textContent = "Juega";
             playing_info[1].querySelector(".status").textContent = "Espera";
@@ -90,7 +102,6 @@ document.addEventListener("DOMContentLoaded",function(){
             playing_info[0].querySelector(".status").textContent = "Espera";
             playing_info[1].querySelector(".status").textContent = "Juega";
           }
-          game.checkWinner();
         });
     });//for each of row
   });//for each of board
